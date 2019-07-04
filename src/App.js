@@ -1,24 +1,61 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, {
+  useState,
+  useEffect
+} from "react";
 import './App.css';
+import axios from "axios";
+
+let globalText = "";
+function postData(text, cb) {
+  if (globalText === text) {
+    return;
+  } else {
+    globalText = text;
+  }
+  axios({
+    method: 'post',
+    url: 'http://localhost:3000/',
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept"
+    },
+    data: {
+      text
+    }
+  }).then(cb)
+    // then((response) => updateVal(response))
+    .catch(function (error) {
+      console.log(error);
+    });
+}
 
 function App() {
+  const [userInput, setInput] = useState("");
+  const [bias, setBias] = useState("");
+  
+  const updateVal = (res) => {
+    console.log("RESPONSE ---- ");
+    console.log(res.data.title);
+    setBias(res.data.title);
+  };
+
+  async function callApi() {
+    postData(userInput, (data) => updateVal(data));
+  }
+
+  useEffect(() => {
+    postData();
+  });
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+        <input value={userInput} id="userInput" onChange={evt => setInput(evt.target.value)}/>
+        <button onClick={() => callApi()}>
+          callApi
+        </button>
+
+        <h3>Response</h3>
+        <div id="bias">{bias}</div>
     </div>
   );
 }
