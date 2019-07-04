@@ -44,7 +44,7 @@ function App() {
   }
 
   useEffect(() => {
-    postData();
+    postData("i love you");
   });
 
   return (
